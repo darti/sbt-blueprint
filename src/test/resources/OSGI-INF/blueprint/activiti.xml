@@ -1,0 +1,14 @@
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0" xmlns:camel="http://camel.apache.org/schema/blueprint">
+    <camelContext id="camelContext" xmlns="http://camel.apache.org/schema/blueprint">
+        <packageScan>
+            <package>fr.dartiguenave.tests.activiti</package>
+        </packageScan>
+    </camelContext>
+    <reference id="runtimeService" interface="org.activiti.engine.RuntimeService"/>
+    <service interface="org.activiti.camel.ContextProvider">
+        <bean class="org.activiti.camel.SimpleContextProvider">
+            <argument value="OrderProcess"/>
+            <argument ref="camelContext"/>
+        </bean>
+    </service>
+</blueprint>
