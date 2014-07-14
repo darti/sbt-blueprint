@@ -1,5 +1,11 @@
 package io.ekai.sbt.blueprint
 
+import org.specs2.mutable.Specification
+
+import scala.xml.XML
+
+import aQute.bnd.osgi.Constants._
+
 /**
  * Created on 06/07/14.
  *
