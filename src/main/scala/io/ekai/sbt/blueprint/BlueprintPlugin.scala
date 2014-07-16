@@ -1,5 +1,6 @@
 package io.ekai.sbt.blueprint
 
+import org.apache.ivy.util.ChecksumHelper
 import sbt._
 import Keys._
 import com.typesafe.sbt.osgi.SbtOsgi
@@ -12,12 +13,24 @@ import com.typesafe.sbt.osgi.SbtOsgi
  */
 object BlueprintPlugin extends AutoPlugin {
 
-  override lazy val projectSettings = Seq(commands += blueprint)
+  object autoImport {
+    lazy val blueprint = taskKey[String]("Parse Blueprint file.")
+  }
 
-  lazy val blueprint =
-    Command.command("blueprint") { (state: State) =>
-      println("Hi!")
-      state
+  import autoImport._
+
+  override def projectSettings: Seq[Setting[_]] = Seq(
+    includeFilter in blueprint := AllPassFilter,
+    excludeFilter in blueprint := HiddenFileFilter,
+    blueprint := {
+      unmanagedResourceDirectories map {
+        _ map { f =>
+          println(f)
+        }
+      }
+
+      "coincoin"
     }
+  )
 
 }
