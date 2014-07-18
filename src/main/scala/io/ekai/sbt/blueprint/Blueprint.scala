@@ -59,7 +59,7 @@ object Blueprint {
     exports
   }
 
-  def manifest(blueprint: Elem) = {
+  def blueprintHeaders(blueprint: Elem) = {
     Map(
       IMPORT_PACKAGE -> importClass(blueprint),
       EXPORT_SERVICE -> exportService(blueprint)
