@@ -1,13 +1,10 @@
 package io.ekai.sbt.blueprint
 
+import io.ekai.sbt.blueprint.Blueprint._
+import sbt.Keys._
 import sbt._
-import Keys._
 
 import scala.xml._
-
-import Blueprint._
-
-import scalaz.Scalaz._
 
 /**
  * Created on 12/07/14.
@@ -17,23 +14,32 @@ import scalaz.Scalaz._
 object BlueprintPlugin extends AutoPlugin {
 
   object autoImport {
-    lazy val blueprint = taskKey[Unit]("Parse Blueprint file.")
+    lazy val blueprintResources = taskKey[Seq[File]]("Blueprint resources")
+
+    lazy val blueprintNodes = taskKey[Seq[Elem]]("Blueprint xml")
+
+    lazy val blueprintImportPackage = taskKey[Seq[String]]("Import-Package")
+    lazy val blueprintImportService = taskKey[Seq[String]]("Import-Service")
+    lazy val blueprintExportService = taskKey[Seq[String]]("Export-Service")
+
+    lazy val bpImports = taskKey[Unit]("Print Import-Package")
+    lazy val bpImportServices = taskKey[Unit]("Print Import-Service")
+    lazy val bpExportServices = taskKey[Unit]("Print Export-Service")
   }
 
-  import autoImport._
-
-  private def mergeHeaders(h1 : Map[String, Seq[String]], h2 : Map[String, Seq[String]]) = {
-    h1.unionWith(h2)( _ ++ _)
-  }
+  import io.ekai.sbt.blueprint.BlueprintPlugin.autoImport._
 
   override def projectSettings: Seq[Setting[_]] = Seq(
-    blueprint := {
-      val bp =  (unmanagedResources in Compile).value flatMap { s => (s / "OSGI-INF" / "blueprint"  ** "*.xml").get }
-      val headers = bp map { f => blueprintHeaders(XML.loadFile(f))}
-      val res = headers reduceLeft { _.unionWith(_) { _ ++ _ }}
+    blueprintResources := (unmanagedResources in Compile).value flatMap { s => (s / "OSGI-INF" / "blueprint"  ** "*.xml").get },
+    blueprintNodes := blueprintResources.value map XML.loadFile,
 
-      println(res)
-    }
+    blueprintImportPackage := blueprintNodes.value flatMap importPackage,
+    blueprintImportService := blueprintNodes.value flatMap importService,
+    blueprintExportService := blueprintNodes.value flatMap exportService,
+
+
+    bpImports := println(blueprintImportPackage.value mkString ", "),
+    bpImportServices := println(blueprintImportPackage.value mkString ", "),
+    bpExportServices := println(blueprintImportPackage.value mkString ", ")
   )
-
 }

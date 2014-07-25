@@ -1,5 +1,7 @@
 package io.ekai.sbt.blueprint
 
+import io.ekai.sbt.blueprint.tools.BlueprintTools
+
 import scala.xml.{ NodeSeq, Elem }
 import aQute.bnd.osgi.Constants._
 
@@ -8,21 +10,10 @@ import aQute.bnd.osgi.Constants._
  *
  * @author Matthieu Dartiguenave, matthieu@ekai.io
  */
-object Blueprint {
+object Blueprint extends BlueprintTools {
 
-  val \ = (b: String) => (a: NodeSeq) => a \ b
-  val \\ = (b: String) => (a: NodeSeq) => a \\ b
 
-  def buildPattern(l: List[NodeSeq => NodeSeq]) =
-    (ns: NodeSeq) =>
-      {
-        val h = l.head
-        val t = l.tail
-
-        t.foldLeft(h(ns))((n, op) => n flatMap op)
-      }
-
-  val importClassPatterns = Seq(
+  val importClassPatterns : Rules = Seq(
     List(\\("bean"), \("@class")),
     List(\\("service"), \("@interface")),
     List(\\("service"), \("interfaces"), \("value")),
@@ -34,35 +25,28 @@ object Blueprint {
     List(\\("array"), \("@value-type")),
     List(\\("map"), \("@key-type")),
     List(\\("map"), \("@value-type"))
-  ) map buildPattern
+  )
 
-  val exportServicePatterns = Seq(
+  val exportServicePatterns : Rules = Seq(
     List(\\("service"), \("@interface")),
     List(\\("service"), \("interfaces"), \("value"))
-  ) map buildPattern
+  )
 
-  def classToPackage(c: String) = {
-    val i = c lastIndexOf '.'
+  val importServicePatterns : Rules = Seq(
+    List(\\("reference"), \("@interface")),
+    List(\\("reference-list"), \("@interfaces"))
+  )
 
-    if (i < 0) c else c take i
-  }
 
-  def importClass(blueprint: Elem) = {
-    val imports = importClassPatterns flatMap { p => p(blueprint).map(_.text) } map classToPackage
 
-    imports :+ "org.osgi.service.blueprint;version=\"[1.0.0,2.0.0)\""
-  }
+  private def extractor(rules : Rules) = (bp : Elem) => rules map buildPattern flatMap { p => p(bp) map (_.text) }
 
-  def exportService(blueprint: Elem) = {
-    val exports = exportServicePatterns flatMap { p => p(blueprint).map(_.text) }
+  def importPackage(blueprint : Elem) =
+    (extractor(importClassPatterns)(blueprint) map classToPackage) :+
+      "org.osgi.service.blueprint;version=\"[1.0.0,2.0.0)\""
 
-    exports
-  }
+  def exportService(blueprint : Elem) = extractor(exportServicePatterns)(blueprint)
 
-  def blueprintHeaders(blueprint: Elem) = {
-    Map(
-      IMPORT_PACKAGE -> importClass(blueprint),
-      EXPORT_SERVICE -> exportService(blueprint)
-    )
-  }
+  def importService(blueprint : Elem) = extractor(importServicePatterns)(blueprint)
+
 }
