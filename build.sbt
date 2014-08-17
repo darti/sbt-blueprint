@@ -19,3 +19,5 @@ addSbtPlugin("com.typesafe.sbt" % "sbt-osgi" % "0.7.0")
 
 
 initialCommands in console := "import io.ekai.sbt.blueprint._"
+
+mainClass := Some("io.ekai.sbt.blueprint.BndTest")

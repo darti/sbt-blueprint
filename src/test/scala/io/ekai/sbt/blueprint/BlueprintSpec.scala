@@ -19,6 +19,7 @@ class BlueprintSpec extends Specification {
     val path = getClass.getResource("/OSGI-INF/blueprint/bp.xml")
     val bp = XML.load(path)
 
+    /*
     val bpManifest = manifest(bp)
 
     "exports package p1 to p13" in {
@@ -40,6 +41,7 @@ class BlueprintSpec extends Specification {
 
       true
     }
+    */
   }
 
 }
