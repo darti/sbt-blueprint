@@ -28,8 +28,15 @@ object BndTest extends App {
   )
 
   import Bnd._
+  import aQute.bnd.osgi.Constants._
 
-  val manifest = bnd(classpath)
+  val properties = Map(
+    BUNDLE_SYMBOLICNAME -> Seq("routes"),
+    BUNDLE_VERSION -> Seq("0.0.1-SNAPSHOT"),
+    IMPORT_PACKAGE -> Seq("*")
+  )
+
+  val manifest = bnd(classpath, properties)
 
   manifest.getEntries foreach println
   manifest.getMainAttributes foreach println
