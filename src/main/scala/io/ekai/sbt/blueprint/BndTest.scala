@@ -6,8 +6,7 @@ object BndTest extends App {
 
 
   val classpath = Seq(
-    "/home/matthieu/Projects/afirm/routes/target/scala-2.10/classes",
-    "/home/matthieu/.sbt/boot/scala-2.10.4/lib/scala-library.jar",
+        "/home/matthieu/.sbt/boot/scala-2.10.4/lib/scala-library.jar",
     "/home/matthieu/.ivy2/cache/org.apache.camel/camel-core/jars/camel-core-2.13.2.jar",
     "/home/matthieu/.ivy2/cache/org.slf4j/slf4j-api/jars/slf4j-api-1.6.6.jar",
     "/home/matthieu/.ivy2/cache/com.sun.xml.bind/jaxb-impl/jars/jaxb-impl-2.2.6.jar",
@@ -27,16 +26,17 @@ object BndTest extends App {
     "/home/matthieu/.ivy2/cache/org.jsslutils/jsslutils/bundles/jsslutils-1.0.5.jar"
   )
 
-  import Bnd._
+  import Osgi._
   import aQute.bnd.osgi.Constants._
 
   val properties = Map(
-    BUNDLE_SYMBOLICNAME -> Seq("routes"),
+   // BUNDLE_SYMBOLICNAME -> Seq("routes"),
     BUNDLE_VERSION -> Seq("0.0.1-SNAPSHOT"),
     IMPORT_PACKAGE -> Seq("*")
   )
 
-  val manifest = bnd(classpath, properties)
+  val classes ="/home/matthieu/Projects/afirm/routes/target/scala-2.10/classes"
+  val manifest = bnd(classes, classpath, properties)
 
   manifest.getEntries foreach println
   manifest.getMainAttributes foreach println
