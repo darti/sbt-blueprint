@@ -38,6 +38,8 @@ object BndTest extends App {
   val classes ="/home/matthieu/Projects/afirm/routes/target/scala-2.10/classes"
   val manifest = bnd(classes, classpath, properties)
 
-  manifest.getEntries foreach println
-  manifest.getMainAttributes foreach println
+
+  val headers = manifest.getMainAttributes.entrySet().withFilter(_.getKey.toString !=  "Require-Capability" ).map {e => e.getKey.toString ->  e.getValue.toString}.toSeq
+
+  headers foreach println
 }

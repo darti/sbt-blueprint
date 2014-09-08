@@ -56,7 +56,8 @@ object BlueprintPlugin extends AutoPlugin {
     val bndManifest = bnd(classes.absolutePath, classpath, inputHeaders)
 
     import scala.collection.JavaConversions._
-    bndManifest.getMainAttributes.entrySet().map {e => e.getKey.toString ->  e.getValue.toString}.toSeq
+    // temporary filter Require-Capability until upgrade to karaf 3.0
+    bndManifest.getMainAttributes.entrySet().withFilter(_.getKey.toString !=  "Require-Capability" ).map {e => e.getKey.toString ->  e.getValue.toString}.toSeq
   }
 
   override def projectSettings: Seq[Setting[_]] = Seq(
